@@ -41,17 +41,17 @@ workflows:
   Example_Workflow:
     jobs:
       - Hello-World
-      - I-Have-Code
+      - I-Have-Code:
           requires:
             - Hello-World
-      - Run-With-Node
+      - Run-With-Node:
           requires:
             - Hello-World
-      - Hold-For-Approval
+      - Hold-For-Approval:
           type: approval
           requires:
             - I-Have-Code
             - Run-With-Node
-      - Now-Complete
+      - Now-Complete:
           requires:
             - Hold-For-Approval
