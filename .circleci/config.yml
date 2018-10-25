@@ -50,8 +50,8 @@ workflows:
       - Hold-For-Approval
           type: approval
           requires:
-            - Run-With-Node
             - I-Have-Code
+            - Run-With-Node
       - Now-Complete
           requires:
             - Hold-For-Approval
