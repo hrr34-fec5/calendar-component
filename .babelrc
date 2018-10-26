@@ -1,0 +1,9 @@
+{
+  "presets": [["env", {"modules": false}]],
+
+  "env": {
+    "test": {
+      "plugins": ["@babel/transform-es2015-modules-commonjs"]
+    }
+  }
+}
