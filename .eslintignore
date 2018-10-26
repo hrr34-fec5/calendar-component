@@ -1,5 +1,5 @@
 client/dist/
 node_modules
 package-lock.json
-jest-config.js
+jest.config.js
 *.test.js
