@@ -11,9 +11,11 @@ class App extends React.Component {
     return (
       <div>
         <h1>Hello World</h1>
-        {/* <Calendar />; */}
       </div>);
   }
 }
 
 ReactDOM.render(<App />, document.getElementById('app'));
+
+
+export { app }
