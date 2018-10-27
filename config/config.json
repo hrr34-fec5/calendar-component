@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root",
+    "password": "UG28g4Z9Nx",
+    "database": "grounded_n_grits_development",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": "UG28g4Z9Nx",
+    "database": "grounded_n_grits_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": "UG28g4Z9Nx",
+    "database": "grounded_n_grits_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}

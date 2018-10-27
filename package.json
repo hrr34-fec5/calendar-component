@@ -9,12 +9,13 @@
   "scripts": {
     "test": "jest --errorOnDeprecated",
     "lint": "eslint ./",
-    "start": "webpack-cli --watch & live-server --open=./client/public/index.html --port=3000"
+    "start": "webpack-cli --watch & live-server --open=./client/public/index.html --port=3000",
+    "db:start": "nodemon ./server/index.js"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
-    "mysql": "^2.16.0",
+    "mysql2": "^1.6.1",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
     "sequelize": "^4.41.0"
@@ -41,8 +42,10 @@
     "jest-cli": "^23.6.0",
     "jest-environment-enzyme": "^7.0.0",
     "jest-enzyme": "^7.0.0",
+    "nodemon": "^1.18.5",
     "path": "^0.12.7",
     "react-test-renderer": "^16.6.0",
+    "sequelize-cli": "^5.2.0",
     "webpack": "^4.23.1",
     "webpack-cli": "^3.1.2"
   },

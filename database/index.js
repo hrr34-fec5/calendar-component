@@ -1,22 +1,34 @@
 const Sequelize = require('sequelize');
-const config = require('./config.js');
+const config = require('../config/config.json');
 
-const sequelize = new Sequelize('grounded_n_grits_sqlize', 'root', config.rootPassword, {
+
+const sequelize = new Sequelize('', 'root', config.rootPassword, {
   host: 'localhost',
   dialect: 'mysql',
 
 });
 
+sequelize.query('CREATE DATABASE IF NOT EXISTS grounded_n_grits;')
+  .then(sequelize.query('USE grounded_n_grits'));
+
 const User = sequelize.define('user', {
   user_id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
   full_name: Sequelize.STRING,
+  host: Sequelize.BOOLEAN,
 });
-
 
 const Listing = sequelize.define('listing', {
   listing_id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
   minimum_nights: Sequelize.INTEGER,
   cancellation_policy: Sequelize.TEXT,
+  host_id: {
+    type: Sequelize.INTEGER,
+    references: {
+      model: User,
+      key: 'user_id',
+      deferrable: Sequelize.Deferrable.INITIALLY_IMMEDIATE,
+    },
+  },
 });
 
 const Booking = sequelize.define('bookings', {
