@@ -1,4 +1,4 @@
-const db = require('../database/index.js');
+const db = require('../models/models.js');
 
 module.exports = {
   guest: {
