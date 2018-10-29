@@ -5,6 +5,7 @@ USE grounded_n_grits;
 
 CREATE TABLE IF NOT EXISTS user (
   user_id                                        INT(8) AUTO_INCREMENT,
+  email                                                   VARCHAR(255),
   full_name                                               VARCHAR(255),
   host                                                         BOOLEAN,
   PRIMARY KEY(user_id)

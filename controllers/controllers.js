@@ -15,6 +15,7 @@ module.exports = {
             return;
           }
           db.User.create({
+            email: request.body.email,
             full_name: request.body.full_name,
             host: request.body.host,
           });
@@ -37,6 +38,7 @@ module.exports = {
           }
 
           db.User.create({
+            email: request.body.email,
             full_name: request.body.full_name,
             host: request.body.host,
           });

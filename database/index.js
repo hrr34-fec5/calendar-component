@@ -10,6 +10,7 @@ const sequelize = new Sequelize('grounded_n_grits', 'root', config.development.p
 
 const User = sequelize.define('user', {
   user_id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+  email: Sequelize.STRING,
   full_name: Sequelize.STRING,
   host: Sequelize.BOOLEAN,
 });
