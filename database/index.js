@@ -1,15 +1,12 @@
 const Sequelize = require('sequelize');
-const config = require('../config/config.json');
+// const mysql = require('mysql2');
+const { config } = require('../config/config.js');
 
-
-const sequelize = new Sequelize('', 'root', config.rootPassword, {
-  host: 'localhost',
+const sequelize = new Sequelize('grounded_n_grits', 'root', config.development.password, {
+  host: '127.0.0.1',
   dialect: 'mysql',
-
+  port: '3306',
 });
-
-sequelize.query('CREATE DATABASE IF NOT EXISTS grounded_n_grits;')
-  .then(sequelize.query('USE grounded_n_grits'));
 
 const User = sequelize.define('user', {
   user_id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
@@ -95,10 +92,12 @@ Listing.hasMany(ListingAvailableNights);
 Booking.belongsTo(Listing);
 ListingAvailableNights.hasMany(Booking);
 
-User.sync();
-Listing.sync();
-Booking.sync();
-ListingAvailableNights.sync();
+sequelize.query('CREATE DATABASE IF NOT EXISTS grounded_n_grits;')
+  .then(sequelize.query('USE grounded_n_grits'))
+  .then(User.sync())
+  .then(Listing.sync())
+  .then(Booking.sync())
+  .then(ListingAvailableNights.sync());
 
 exports.User = User;
 exports.Listing = Listing;

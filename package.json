@@ -13,6 +13,7 @@
     "db:start": "nodemon ./server/index.js"
   },
   "dependencies": {
+    "bluebird": "^3.5.2",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "mysql2": "^1.6.1",
