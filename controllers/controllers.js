@@ -14,7 +14,7 @@ module.exports = {
             response.status(200).send();
             return;
           }
-          db.User.create({
+          return db.User.create({
             email: request.body.email,
             full_name: request.body.full_name,
             host: request.body.host,

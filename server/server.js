@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const moment = require('moment');
+const Promise = require('bluebird');
 // const dbConnection = require('../database/database.js');
 // const modelsSQL = require('../models/modelsSQL');
 const db = require('../models/models.js');
@@ -111,36 +113,50 @@ app.get('/booking/:guestId', (request, response) => {
     .catch(err => response.status(404).send(errorMessage, err));
 });
 
-// [] Need to add a modification to the available night that
-// it is now booked and pass in the ID of this new booking
-// In the response object, there's a bookingId,
-// which we can then use to invoke the patch of the given listingId
 app.post('/booking', (request, response) => {
-  db.Booking.create({
-    startDate: request.body.startDate,
-    endDate: request.body.endDate,
-    price: request.body.price,
-    canceled: request.body.canceled,
-    cancellationReason: request.body.cancellationReason,
-    listingId: request.body.listingId,
-    guestId: request.body.guestId,
+  // Confirm the desired nights are available
+  const start = moment(request.body.startDate);
+  const end = moment(request.body.endDate);
+  const bookingDuration = Math.round(moment.duration(end.diff(start)).asDays());
+  return db.ListingAvailableNight.findAll({
+    where:
+     {
+       startDate: { [db.Op.gte]: moment(start).format('YYYY-MM-DD') },
+       endDate: { [db.Op.lte]: moment(end).format('YYYY-MM-DD') },
+       booked: false 
+}, 
   })
-    .then(result => result.dataValues)
-    .then((dataValues) => {
-    // This will mark the available night of startDate only as booked.
-    // We need to update this to map across *all* dates between StartDate and EndDate
-    // Get an array of dates between startDate and EndDate (the last date should be endDate-1)
-    // Map across that array with the following update in an asynchronous fashion
-      db.ListingAvailableNight.update( 
-        { booked: true, 
-          bookingId: dataValues.bookingId, 
-        }, { where: { 
-          startDate: dataValues.startDate, 
-          listingId: dataValues.listingId,
-        } })
-        .then(results => console.log('The values we have for patching are: ', results))
-        .catch(err => response.status(500).send(errorMessage, err));
+    .then((results) => {
+      if (results.length < bookingDuration) {
+        Promise.reject('There\'s a mismatch in the number of nights');
+      }
+      return results;
     })
+    .then((requestedNights) => {
+    // If the nights are available - create the booking
+      const bookingsToCreate = [];
+      requestedNights.forEach(el => bookingsToCreate.push(el.dataValues));
+      return Promise.each(bookingsToCreate, booking => db.Booking.create({
+          startDate: booking.startDate,
+          endDate: booking.endDate,
+          price: booking.price,
+          canceled: booking.canceled,
+          cancellationReason: booking.cancellationReason,
+          listingId: booking.listingId,
+          guestId: booking.guestId,
+        })
+      );
+    })
+    .then(listOfNights =>
+    // Then update the listing's night to indicate it's been booked.
+      Promise.each(listOfNights, (listing) => db.ListingAvailableNight.update( 
+        { booked: true, 
+          bookingId: listing.bookingId, 
+        }, { where: { 
+          startDate: listing.startDate, 
+          listingId: listing.listingId,
+      } })),
+    )
     .then(results => response.status(201).send(results))
     .catch(err => response.status(500).send(errorMessage, err));
 });

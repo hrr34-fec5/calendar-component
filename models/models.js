@@ -6,8 +6,10 @@ const db = new Sequelize('grounded_n_grits', 'root', config.development.password
   host: '127.0.0.1',
   dialect: 'mysql',
   port: '3306',
-  logging: true,
+  logging: false,
 });
+
+const Op = db.Op;
 
 // User schema
 const User = db.define('users', {
@@ -89,7 +91,7 @@ const ListingAvailableNight = db.define('listing_available_night', {
       deferrable: Sequelize.Deferrable.INITIALLY_DEFERRED,
     },
   },
-  }, {
+}, {
   timestamps: false,
 });
 
@@ -128,3 +130,5 @@ exports.User = User;
 exports.Listing = Listing;
 exports.Booking = Booking;
 exports.ListingAvailableNight = ListingAvailableNight;
+
+exports.Op = Op;
