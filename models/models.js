@@ -95,7 +95,7 @@ const ListingAvailableNight = db.define('listing_available_night', {
 
 // Model relationships
 Listing.belongsTo(User, { foreignKey: 'hostId', targetKey: 'userId', constraints: false });
-User.hasMany(Listing);
+User.hasMany(Listing, {constraints: false});
 
 Booking.belongsTo(Listing, { foreignKey: 'listingId', targetKey: 'listingId', constraints: false });
 Listing.hasMany(Booking, { onDelete: 'cascade', constraints: false });
@@ -105,14 +105,15 @@ User.hasMany(Booking, { onDelete: 'cascade', constraints: false });
 
 ListingAvailableNight.belongsTo(Listing, { foreignKey: 'listingId', targetKey: 'listingId', constraints: false });
 ListingAvailableNight.belongsTo(Booking, { foreignKey: 'bookingId', targetKety: 'bookingId', constraints: false });
-Listing.hasMany(ListingAvailableNight);
-Booking.hasMany(ListingAvailableNight);
+Listing.hasMany(ListingAvailableNight, {constraints: false});
+Booking.hasMany(ListingAvailableNight, {constraints: false});
 
 Booking.belongsTo(Listing, { foreignKey: 'listingId', targetKey: 'listingId', constraints: false });
-ListingAvailableNight.hasMany(Booking);
+ListingAvailableNight.hasMany(Booking, {constraints: false});
 
 // Create a new database if it doesn't exist;
-db.query('CREATE DATABASE IF NOT EXISTS grounded_n_grits;')
+db.sync()
+  .then(() => db.query('CREATE DATABASE IF NOT EXISTS grounded_n_grits;'))
   .then(() => db.query('USE grounded_n_grits'))
   .then(() => User.sync())
   .then(() => Listing.sync())
