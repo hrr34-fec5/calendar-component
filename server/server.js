@@ -21,84 +21,218 @@ app.use(bodyParser.json());
 
 const errorMessage = 'There was an error creating the record: ';
 
+// Guest Endpoints
 app.get('/guest', (request, response) => {
   db.User.findAll({})
-    .then(message => response.status(200).send(message));
+    .then(message => response.status(200).send(message))
+    .catch(err => response.status(404).send(errorMessage, err));
 });
 
 app.post('/guest', (request, response) => {
   db.User.create({
     email: request.body.email,
-    full_name: request.body.full_name,
+    fullName: request.body.fullName,
     host: request.body.host,
   })
     .then(message => response.status(201).send(message))
     .catch(err => response.status(500).send(errorMessage, err));
 });
 
-
+// Host Endpoints
 app.get('/host', (request, response) => {
   db.User.findAll({ where: { host: true } })
-    .then(results => response.status(200).send(results));
+    .then(results => response.status(200).send(results))
+    .catch(err => response.status(404).send(errorMessage, err));
 });
 
 app.post('/host', (request, response) => {
   db.User.create({
     email: request.body.email,
-    full_name: request.body.full_name,
+    fullName: request.body.fullName,
     host: request.body.host,
   })
     .then(message => response.status(201).send(message))
     .catch(err => response.status(500).send(errorMessage, err));
 });
 
+// Listing Endpoints
 app.get('/listing', (request, response) => {
   db.Listing.findAll({})
-    .then(results => response.status(200).send(results));
+    .then(results => response.status(200).send(results))
+    .catch(err => response.status(404).send(errorMessage, err));
 });
 
 app.post('/listing', (request, response) => {
   db.Listing.create({
-    name: request.body.name,
-    description: request.body.description,
-    minimum_nights: request.body.minimum_nights,
-    cancellation_policy: request.body.cancellation_policy,
-    host_id: request.body.host_id,
+    listingName: request.body.listingName,
+    listingDescription: request.body.listingDescription,
+    minimumNights: request.body.minimumNights,
+    cancellationPolicy: request.body.cancellationPolicy,
+    hostId: request.body.hostId,
   })
     .then(result => response.status(201).send(result))
     .catch(err => response.status(500).send(errorMessage, err));
 });
 
-app.get('/listing/:host_id', (request, response) => {
-  db.Listing.findAll({ where: { host_id: request.params.host_id } })
-    .then(results => response.status(200).send(results));
+app.post('/listing/:hostId', (request, response) => {
+  db.Listing.create({
+    listingName: request.body.listingName,
+    listingDescription: request.body.listingDescription,
+    minimumNights: request.body.minimumNights,
+    cancellationPolicy: request.body.cancellationPolicy,
+    hostId: request.params.hostId,
+  })
+    .then(result => response.status(201).send(result))
+    .catch(err => response.status(500).send(errorMessage, err));
 });
 
-app.get('booking', (request, response) => {
+app.get('/listing/:hostId', (request, response) => {
+  db.Listing.findAll({ where: { hostId: request.params.hostId } })
+    .then(results => response.status(200).send(results))
+    .catch(err => response.status(404).send(errorMessage, err));
+});
+
+// Booking Endpoints
+app.get('/booking', (request, response) => {
   db.Booking.findAll({})
-    .then(results => response.status(200).send(results));
+    .then(results => response.status(200).send(results))
+    .catch(err => response.status(404).send(errorMessage, err));
 });
 
-app.get('booking/:listing_id', (request, response) => {
-  db.Booking.findAll({ where: { listing_id: request.params.listing_id } })
-    .then(results => response.status(200).send(results));
+app.get('/booking/:listingId', (request, response) => {
+  db.Booking.findAll({ where: { listingId: request.params.listingId } })
+    .then(results => response.status(200).send(results))
+    .catch(err => response.status(404).send(errorMessage, err));
 });
 
-app.get('booking/:guest_id', (request, response) => {
-  db.Booking.findAll({ where: { guest_id: request.params.guest_id } })
-    .then(results => response.status(200).send(results));
+app.get('/booking/:guestId', (request, response) => {
+  db.Booking.findAll({ where: { guestId: request.params.guestId } })
+  .then(results => response.status(200).send(results))
+  .catch(err => response.status(404).send(errorMessage, err));
 });
 
-app.post('booking');
+// [] Need to add a modification to the available night that it is now booked and pass in the ID of this new booking
+// In the response object, there's a bookingId, which we can then use to invoke the patch of the given listingId
+app.post('/booking', (request, response) => {
+  db.Booking.create({
+    startDate: request.body.startDate,
+    endDate: request.body.endDate,
+    price: request.body.price,
+    canceled: request.body.canceled,
+    cancellationReason: request.body.cancellationReason,
+    listingId: request.body.listingId,
+    guestId: request.body.guestId,
+  })
+  .then(result => {return result.dataValues })
+  .then(dataValues => {
+    // This will mark the available night of startDate only as booked. 
+    // We need to update this to map across *all* dates between StartDate and EndDate
+    // Get an array of dates between startDate and EndDate (the last date should be endDate-1)
+    // Map across that array with the following update in an asynchronous fashion
+    db.ListingAvailableNight.update(
+      { 
+        booked: true,
+        bookingId: dataValues.bookingId
+      },
+      { where: { 
+        startDate: dataValues.startDate,
+        listingId: dataValues.listingId 
+      } },
+    )
+    .then(results => console.log(`The values we have for patching are: `, results))
+    .catch(err => response.status(500).send(errorMessage, err));
+  })
+  .then( results => response.status(201).send(results))
+  .catch(err => response.status(500).send(errorMessage, err));
+});
 
-app.get('booking/:guest_id/:listing_id', (request, response) => {
+//[] finish this multi-parameter booking
+app.get('/booking/:guestId/:listingId', (request, response) => {
   console.log(request.params);
   response.status(200).send();
 });
 
+// Available Night Endpoints
 
-// 1 how do i create a connection to the database -
-// so that when node is connected, we are also connected to mysql --
-// 2 how do i create a seed file that the database runs only once?
+app.patch('bookANight/:startDate/:listingId', (request, response) => {
+  //I: a listingId
+  //O: a response from updating a specific listingId depending on what's in the request.body
+  // Question: How do you make this *flexible* such that you don't patch something to undefined, but only take values that are known?
+  console.log(request.body)
+  db.ListingAvailableNight.update(
+    { 
+      booked: request.body.booked,
+      bookingId: request.body.bookingId
+    },
+    { where: { 
+      startDate: request.params.startDate,
+      listingId: request.params.listingId 
+    } },)
+    .then(results => response.status(203).send(results)) // [] Verify HTTP Status code
+    .catch(err => response.status(404).send(errorMessage, err));
+})
 
+app.get('/nights', (request, response) => {
+  db.ListingAvailableNight.findAll()
+    .then(results => response.status(200).send(results))
+    .catch(err => response.status(404).send(errorMessage, err));
+})
+
+app.get('/nights/:listingId', (request, response) => {
+  db.ListingAvailableNight.findAll({ where: { listingId: request.params.listingId } })
+    .then(results => response.status(200).send(results))
+    .catch(err => response.status(404).send(errorMessage, err));
+})
+
+app.get('/availableNights/:listingId', (request, response) => {
+  db.ListingAvailableNight.findAll({ where: { 
+    listingId: request.params.listingId, 
+    booked: false
+  } })
+    .then(results => response.status(200).send(results))
+    .catch(err => response.status(404).send(errorMessage, err));
+})
+
+app.get('/bookedNights/:listingId', (request, response) => {
+  db.ListingAvailableNight.findAll({ where: { 
+    listingId: request.params.listingId, 
+    booked: true
+  } })
+    .then(results => response.status(200).send(results))
+    .catch(err => response.status(404).send(errorMessage, err));
+})
+
+app.post('/availableNight/:listingId', (request, response) => {
+  db.ListingAvailableNight.create({
+    startDate: request.body.startDate, 
+    endDate: request.body.endDate,
+    booked: request.body.booked,
+    price: request.body.price,
+    bookingId: request.body.bookingId,
+    listingId: request.params.listingId,
+  })
+    .then(result => response.status(201).send(result))
+    .catch(err => response.status(500).send(errorMessage, err));
+})
+
+app.post('/availableNight', (request, response) => {
+  db.ListingAvailableNight.create({
+    startDate: request.body.startDate, 
+    endDate: request.body.endDate,
+    booked: request.body.booked,
+    price: request.body.price,
+    bookingId: request.body.bookingId,
+    listingId: request.body.listingId,
+  })
+    .then(result => response.status(201).send(result))
+    .catch(err => response.status(500).send(errorMessage, err));
+})
+
+
+// [] Add PATCH verb endpoints
+// [] Add DELETE verb endpoints
+// [] Graceful error handling (why does my server shut off when i submit a booking that can't exist 
+// -- i.e. with a host guest that doesn't exist)
+
+// Establish listener
 app.listen(port, () => { console.log(`Listening on port, ${port}`); });
