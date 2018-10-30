@@ -93,25 +93,26 @@ const ListingAvailableNight = db.define('listing_available_night', {
   timestamps: false,
 });
 
-// Model relationships
+// Establish relationships
 Listing.belongsTo(User, { foreignKey: 'hostId', targetKey: 'userId', constraints: false });
-User.hasMany(Listing, {constraints: false});
-
 Booking.belongsTo(Listing, { foreignKey: 'listingId', targetKey: 'listingId', constraints: false });
-Listing.hasMany(Booking, { onDelete: 'cascade', constraints: false });
-
 Booking.belongsTo(User, { foreignKey: 'guestId', targetKey: 'userId', constraints: false });
-User.hasMany(Booking, { onDelete: 'cascade', constraints: false });
-
 ListingAvailableNight.belongsTo(Listing, { foreignKey: 'listingId', targetKey: 'listingId', constraints: false });
 ListingAvailableNight.belongsTo(Booking, { foreignKey: 'bookingId', targetKety: 'bookingId', constraints: false });
-Listing.hasMany(ListingAvailableNight, {constraints: false});
-Booking.hasMany(ListingAvailableNight, {constraints: false});
-
 Booking.belongsTo(Listing, { foreignKey: 'listingId', targetKey: 'listingId', constraints: false });
-ListingAvailableNight.hasMany(Booking, {constraints: false});
+
+// 1:m relationships
+// User.hasMany(Listing, { constraints: false });
+// User.hasMany(Booking, { onDelete: 'cascade', constraints: false });
+// Listing.hasMany(Booking, { onDelete: 'cascade', constraints: false });
+// Listing.hasMany(ListingAvailableNight, { constraints: false });
+// Booking.hasMany(ListingAvailableNight, { constraints: false });
+// ListingAvailableNight.hasMany(Booking, { constraints: false });
+
 
 // Create a new database if it doesn't exist;
+// Note: Sequelize *cannot* create a database if it doesn't exist. https://github.com/sequelize/sequelize/issues/1908
+// Once the database exists, however, it can create the schema.
 db.sync()
   .then(() => db.query('CREATE DATABASE IF NOT EXISTS grounded_n_grits;'))
   .then(() => db.query('USE grounded_n_grits'))
