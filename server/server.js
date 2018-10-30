@@ -107,12 +107,14 @@ app.get('/booking/:listingId', (request, response) => {
 
 app.get('/booking/:guestId', (request, response) => {
   db.Booking.findAll({ where: { guestId: request.params.guestId } })
-  .then(results => response.status(200).send(results))
-  .catch(err => response.status(404).send(errorMessage, err));
+    .then(results => response.status(200).send(results))
+    .catch(err => response.status(404).send(errorMessage, err));
 });
 
-// [] Need to add a modification to the available night that it is now booked and pass in the ID of this new booking
-// In the response object, there's a bookingId, which we can then use to invoke the patch of the given listingId
+// [] Need to add a modification to the available night that
+// it is now booked and pass in the ID of this new booking
+// In the response object, there's a bookingId,
+// which we can then use to invoke the patch of the given listingId
 app.post('/booking', (request, response) => {
   db.Booking.create({
     startDate: request.body.startDate,
@@ -123,88 +125,65 @@ app.post('/booking', (request, response) => {
     listingId: request.body.listingId,
     guestId: request.body.guestId,
   })
-  .then(result => {return result.dataValues })
-  .then(dataValues => {
-    // This will mark the available night of startDate only as booked. 
+    .then(result => result.dataValues)
+    .then((dataValues) => {
+    // This will mark the available night of startDate only as booked.
     // We need to update this to map across *all* dates between StartDate and EndDate
     // Get an array of dates between startDate and EndDate (the last date should be endDate-1)
     // Map across that array with the following update in an asynchronous fashion
-    db.ListingAvailableNight.update(
-      { 
-        booked: true,
-        bookingId: dataValues.bookingId
-      },
-      { where: { 
-        startDate: dataValues.startDate,
-        listingId: dataValues.listingId 
-      } },
-    )
-    .then(results => console.log(`The values we have for patching are: `, results))
+      db.ListingAvailableNight.update( 
+        { booked: true, 
+          bookingId: dataValues.bookingId, 
+        }, { where: { 
+          startDate: dataValues.startDate, 
+          listingId: dataValues.listingId,
+        } })
+        .then(results => console.log('The values we have for patching are: ', results))
+        .catch(err => response.status(500).send(errorMessage, err));
+    })
+    .then(results => response.status(201).send(results))
     .catch(err => response.status(500).send(errorMessage, err));
-  })
-  .then( results => response.status(201).send(results))
-  .catch(err => response.status(500).send(errorMessage, err));
-});
-
-//[] finish this multi-parameter booking
-app.get('/booking/:guestId/:listingId', (request, response) => {
-  console.log(request.params);
-  response.status(200).send();
 });
 
 // Available Night Endpoints
-
-app.patch('bookANight/:startDate/:listingId', (request, response) => {
-  //I: a listingId
-  //O: a response from updating a specific listingId depending on what's in the request.body
-  // Question: How do you make this *flexible* such that you don't patch something to undefined, but only take values that are known?
-  console.log(request.body)
-  db.ListingAvailableNight.update(
-    { 
-      booked: request.body.booked,
-      bookingId: request.body.bookingId
-    },
-    { where: { 
-      startDate: request.params.startDate,
-      listingId: request.params.listingId 
-    } },)
-    .then(results => response.status(203).send(results)) // [] Verify HTTP Status code
-    .catch(err => response.status(404).send(errorMessage, err));
-})
 
 app.get('/nights', (request, response) => {
   db.ListingAvailableNight.findAll()
     .then(results => response.status(200).send(results))
     .catch(err => response.status(404).send(errorMessage, err));
-})
+});
 
 app.get('/nights/:listingId', (request, response) => {
   db.ListingAvailableNight.findAll({ where: { listingId: request.params.listingId } })
     .then(results => response.status(200).send(results))
     .catch(err => response.status(404).send(errorMessage, err));
-})
+});
 
 app.get('/availableNights/:listingId', (request, response) => {
-  db.ListingAvailableNight.findAll({ where: { 
-    listingId: request.params.listingId, 
-    booked: false
-  } })
+  db.ListingAvailableNight.findAll({
+    where: {
+      listingId: request.params.listingId,
+      booked: false,
+    },
+  })
     .then(results => response.status(200).send(results))
     .catch(err => response.status(404).send(errorMessage, err));
-})
+});
 
 app.get('/bookedNights/:listingId', (request, response) => {
-  db.ListingAvailableNight.findAll({ where: { 
-    listingId: request.params.listingId, 
-    booked: true
-  } })
+  db.ListingAvailableNight.findAll({
+    where: {
+      listingId: request.params.listingId,
+      booked: true,
+    },
+  })
     .then(results => response.status(200).send(results))
     .catch(err => response.status(404).send(errorMessage, err));
-})
+});
 
 app.post('/availableNight/:listingId', (request, response) => {
   db.ListingAvailableNight.create({
-    startDate: request.body.startDate, 
+    startDate: request.body.startDate,
     endDate: request.body.endDate,
     booked: request.body.booked,
     price: request.body.price,
@@ -213,11 +192,11 @@ app.post('/availableNight/:listingId', (request, response) => {
   })
     .then(result => response.status(201).send(result))
     .catch(err => response.status(500).send(errorMessage, err));
-})
+});
 
 app.post('/availableNight', (request, response) => {
   db.ListingAvailableNight.create({
-    startDate: request.body.startDate, 
+    startDate: request.body.startDate,
     endDate: request.body.endDate,
     booked: request.body.booked,
     price: request.body.price,
@@ -226,12 +205,35 @@ app.post('/availableNight', (request, response) => {
   })
     .then(result => response.status(201).send(result))
     .catch(err => response.status(500).send(errorMessage, err));
-})
+});
 
 
 // [] Add PATCH verb endpoints
+// app.patch('bookANight/:startDate/:listingId', (request, response) => {
+//   // I: a listingId
+//   // O: a response from updating a specific listingId depending on what's in the request.body
+//   // Question: How do you make this *flexible* such that you don't
+//   // patch something to undefined, but only take values that are known?
+//   console.log(request.body);
+//   db.ListingAvailableNight.update(
+//     { booked: request.body.booked,
+//       bookingId: request.body.bookingId,
+//     }, { where: {
+//         startDate: request.params.startDate,
+//         listingId: request.params.listingId,
+//     } })
+//     .then(results => response.status(203).send(results)) // [] Verify HTTP Status code
+//     .catch(err => response.status(404).send(errorMessage, err));
+// });
+
+// [] finish this multi-parameter booking
+// app.get('/booking/:guestId/:listingId', (request, response) => {
+//   console.log(request.params);
+//   response.status(200).send();
+// });
+
 // [] Add DELETE verb endpoints
-// [] Graceful error handling (why does my server shut off when i submit a booking that can't exist 
+// [] Graceful error handling (why does my server shut off when i submit a booking that can't exist
 // -- i.e. with a host guest that doesn't exist)
 
 // Establish listener
