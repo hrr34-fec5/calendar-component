@@ -2,10 +2,8 @@ const faker = require('faker');
 const moment = require('moment');
 const momentRandom = require('moment-random');
 const Promise = require('bluebird');
-const db = require('../models/models.js')
+const db = require('../models/models.js');
 
-
-// users - guests and hosts - 400 total (~300 guests, 100 hosts )
 const createUser = () => {
   const email = faker.internet.email();
   const fullName = faker.name.findName();
@@ -13,88 +11,98 @@ const createUser = () => {
   return guest = { email, fullName, host };
 };
 
-let populateUsers = () => {
-  let users = [];
-  for (let i = 0; i < 400; i += 1) {
-    users.push(createUser());
-  };
-  Promise.each(users, (user) => {
-    return db.User.create({
-      email: user.email,
-      fullName: user.fullName,
-      host: user.host,
-    })
-  })
-  .then( () => console.log(`Successfully created ${users.length} users.`));
-};
-  
-
-
 const createListing = () => {
   const cancellationPolicies = ['Flexible', 'Moderate', 'Strict', 'Super Strict'];
   const listingName = faker.random.words(2);
   const listingDescription = faker.lorem.words(10);
-  const minimumNights = faker.random.number({ min: 0, max: 2 });
-  const cancellationPolicy = cancellationPolicies[faker.random.number({ min: 0, max: 3 })];
-  const host_id = faker.random.number({'min': 0, 'max': 400});
-  return listing = { listingName, listingDescription, minimumNights, cancellationPolicy, host_id }
+  const minimumNights = faker.random.number({ 'min': 0, 'max': 2 });
+  const cancellationPolicy = cancellationPolicies[faker.random.number({ 'min': 0, 'max': 3 })];
+  const host_id = faker.random.number({ min: 0, max: 399 });
+  return listing = {
+    listingName, listingDescription, minimumNights, cancellationPolicy, host_id,
+  };
 };
 
-let populateListings = () => {
-  let listings = [];
-  for (let i = 0; i < 200; i += 1) {
+const createAvailableNight = (listingIdInput) => {
+  const price = faker.commerce.price(30, 200, 2);
+  const startDate = momentRandom('2019-01-31', '2018-11-01');
+  const endDate = moment(startDate).add(1, 'days');
+  const booked = false;
+  const bookingId = undefined;
+  const listingId = listingIdInput;
+  return availableNight = {
+    startDate, endDate, booked, price, bookingId, listingId,
+  };
+};
+
+const createBooking = (bookingIdInput, listingIdQuery) => {
+  db.ListingAvailableNight.findAll({ where: {booked: false, listingId: listingIdQuery}})
+  .then( (availableListingNights) => {
+    let numOfListings = availableListingNights.length;
+    let selectedListing = faker.random.number({'min':0,'max': numOfListings})
+    let selectedNightId = availableListingNights[selectedListing].nightId;
+    return db.ListingAvailableNight.find({ where: { nightId: selectedNightId } })})
+  .then( (selectedNightToUpdate) => { 
+    const startDate = selectedNightToUpdate.startDate; 
+    const endDate = selectedNightToUpdate.endDate;
+    const price = selectedNightToUpdate.price;
+    const canceled = Math.random() <= .05 ? true : false;
+    const cancellationReason = canceled ? faker.lorem.words(5) : undefined;
+    const listingId = selectedNightToUpdate.listingId;
+    const guestId = faker.random.number({ 'min':1, 'max': 400 });
+    db.Booking.create({startDate, endDate, price, canceled, cancellationReason, listingId, guestId})
+    db.ListingAvailableNight.update(
+      {booked: true, bookingId: bookingIdInput }, 
+      {returning: true, where: { nightId: selectedNightToUpdate.nightId } })      
+  })
+  .catch((rejection) => console.log(`Snagged an error!`, rejection))
+}
+
+const populateUsers = () => {
+  const users = [];
+  for (let i = 0; i < 400; i += 1) {
+    users.push(createUser());
+  }
+  db.User.bulkCreate(users, { updatedOnDuplicate: true, individualHooks: true, returning: true })
+  .then(() => db.User.findAll({}))
+  .then((results) => console.log(`Users table has ${results.length} users.`));
+};
+
+const populateListings = () => {
+  const listings = [];
+  for (let i = 0; i < 100; i += 1) {
     listings.push(createListing());
   }
   console.log(listings);
-  // debugger;
-  Promise.each(listings, (listing) => {
-    return db.Listing.create({
-      listingName: listing.listingName,
-      listingDescription: listing.listingDescription,
-      minimumNights: listing.minimumNights,
-      cancellationPolicy: listing.cancellationPolicy,
-      hostId: listing.hostId,
-    })
-  })
-  .then ( () => console.log(`Successfully created ${listings.length} listings.`))
-}
+  db.Listing.bulkCreate(listings, { updatedOnDuplicate: true, individualHooks: true, returning: true })
+  .then(() => db.Listing.findAll({}))
+  .then(results => console.log(`Listing table has ${results.length} listings.`));
+};
 
-
-const createAvailableNights = () => {
-// nights available (between 50 and 80 / listing between November 1, 2018 and January 31, 2019)
-  const numberOfAvailableNights = faker.random.number({ min: 50, max: 80 });
-  const price = faker.commerce.price(30, 200, 2);
-  for (let listing = 0; listing < 100; listing++) {
-    for (let night = 0; night < numberOfAvailableNights; night++) {
-      const startDate = momentRandom('2019-01-31', '2018-11-01');
-      const endDate = moment(startDate).add(1, 'days');
-      let hostId;
-      // while (user_id of faker.random.number({'min': 0, 'max': 400} is NOT a host)
-      // try a new random number
-      // )
-      // host_id = user_id
-      // create an Available night with this information
+const populateNights = () => {
+  let nights = [];
+  for (let listing = 1; listing < 100; listing += 1) {
+    const nightsToList = faker.random.number({ min: 30, max: 90 });
+    for (let singleNight = 0; singleNight < nightsToList; singleNight += 1) {
+      let singleNight = createAvailableNight(listing);
+      nights.push(singleNight);
     }
   }
+  db.ListingAvailableNight.bulkCreate(nights, { updatedOnDuplicate: true, individualHooks: true, returning: true })
+  .then(() => db.ListingAvailableNight.findAll({}))
+  .then((results) => console.log(`Available nights table has ${results.length} nights.`))
 };
 
-const createBooking = () => {
-  // bookings -- (between 20-400 per listing for 1 night between 11/1/2018 and 1/31/2019)
-  const numberOfBookings = faker.random.number({ min: 20, max: 40 });
-  const listingId = faker.random.number({ min: 0, max: 100 });
-  const availableNights = select * from;
-  let startDate;
-  let guestId;
-  // while (user_id of faker.random.number({'min': 0, 'max': 400} IS a host)
-  // try a new random number
-  // )
-  // guest_id = user_id = faker.random.number({'min': 0, 'max': 300})
-  const canceled = Math.random() <= 0.05;
-  if (canceled) {
-    const cancellationReason = faker.lorem.sentence;
+const populateBookings = () => {
+  for (let i = 0; i < 1000; i += 1) {
+    randListingId = faker.random.number({'min': 1, 'max': 100})
+    Promise.resolve(createBooking(i+1, randListingId))
   }
-};
-
-
-// populateUsers();
-populateListings();
+  db.Booking.findAll({})
+  .then(results => console.log(`Booking table has ${results.length} bookings.`))
+}
+ 
+Promise.resolve(populateUsers())
+.then(populateListings())
+.then(populateNights())
+.then(populateBookings())
