@@ -10,7 +10,7 @@
     "test": "jest --errorOnDeprecated",
     "lint": "eslint ./",
     "start": "webpack-cli --watch & live-server --open=./client/public/index.html --port=3000",
-    "db:start": "nodemon ./server/index.js"
+    "db:start": "nodemon ./server/server.js"
   },
   "dependencies": {
     "bluebird": "^3.5.2",
@@ -38,11 +38,14 @@
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-jsx-a11y": "^6.1.2",
     "eslint-plugin-react": "^7.11.1",
+    "faker": "^4.1.0",
     "file-loader": "^2.0.0",
     "jest": "^23.6.0",
     "jest-cli": "^23.6.0",
     "jest-environment-enzyme": "^7.0.0",
     "jest-enzyme": "^7.0.0",
+    "moment": "^2.22.2",
+    "moment-random": "^1.0.4",
     "nodemon": "^1.18.5",
     "path": "^0.12.7",
     "react-test-renderer": "^16.6.0",

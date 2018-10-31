@@ -4,4 +4,4 @@ node_modules
 package-lock.json
 client/dist
 config/config.js
-models/
+models/modelsSQL.js

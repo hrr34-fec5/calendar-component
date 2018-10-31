@@ -1,4 +1,4 @@
-const db = require('../database/index.js');
+const db = require('../models/models.js');
 
 module.exports = {
   guest: {
@@ -14,7 +14,8 @@ module.exports = {
             response.status(200).send();
             return;
           }
-          db.User.create({
+          return db.User.create({
+            email: request.body.email,
             full_name: request.body.full_name,
             host: request.body.host,
           });
@@ -37,6 +38,7 @@ module.exports = {
           }
 
           db.User.create({
+            email: request.body.email,
             full_name: request.body.full_name,
             host: request.body.host,
           });
