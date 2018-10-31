@@ -1,35 +1,63 @@
 const faker = require('faker');
 const moment = require('moment');
 const momentRandom = require('moment-random');
-const controller = require('../controllers/controllers.js');
+const Promise = require('bluebird');
+const db = require('../models/models.js')
+
 
 // users - guests and hosts - 400 total (~300 guests, 100 hosts )
-const createGuest = () => {
-  const userId = faker.internet.email();
+const createUser = () => {
+  const email = faker.internet.email();
   const fullName = faker.name.findName();
   const host = Math.random() <= 0.25;
-  return guest = { userId, fullName, host };
+  return guest = { email, fullName, host };
 };
-debugger;
-const testDate = Date(momentRandom()._d);
-console.log(typeof testDate);
-const guestOne = createGuest();
-controller.guest.get(guestOne);
 
-const cancellationPolicies = ['Flexible', 'Moderate', 'Strict', 'Super Strict'];
-// listing -- 100 (using existing hosts at random)
-// find a host
+let populateUsers = () => {
+  let users = [];
+  for (let i = 0; i < 400; i += 1) {
+    users.push(createUser());
+  };
+  Promise.each(users, (user) => {
+    return db.User.create({
+      email: user.email,
+      fullName: user.fullName,
+      host: user.host,
+    })
+  })
+  .then( () => console.log(`Successfully created ${users.length} users.`));
+};
+  
+
 
 const createListing = () => {
+  const cancellationPolicies = ['Flexible', 'Moderate', 'Strict', 'Super Strict'];
+  const listingName = faker.random.words(2);
+  const listingDescription = faker.lorem.words(10);
   const minimumNights = faker.random.number({ min: 0, max: 2 });
   const cancellationPolicy = cancellationPolicies[faker.random.number({ min: 0, max: 3 })];
-  let host_id;
-  // while (user_id of faker.random.number({'min': 0, 'max': 400} is NOT a host)
-  // try a new random number
-  // )
-  // host_id = user_id
-  // create a listing
+  const host_id = faker.random.number({'min': 0, 'max': 400});
+  return listing = { listingName, listingDescription, minimumNights, cancellationPolicy, host_id }
 };
+
+let populateListings = () => {
+  let listings = [];
+  for (let i = 0; i < 200; i += 1) {
+    listings.push(createListing());
+  }
+  console.log(listings);
+  // debugger;
+  Promise.each(listings, (listing) => {
+    return db.Listing.create({
+      listingName: listing.listingName,
+      listingDescription: listing.listingDescription,
+      minimumNights: listing.minimumNights,
+      cancellationPolicy: listing.cancellationPolicy,
+      hostId: listing.hostId,
+    })
+  })
+  .then ( () => console.log(`Successfully created ${listings.length} listings.`))
+}
 
 
 const createAvailableNights = () => {
@@ -66,3 +94,7 @@ const createBooking = () => {
     const cancellationReason = faker.lorem.sentence;
   }
 };
+
+
+// populateUsers();
+populateListings();
