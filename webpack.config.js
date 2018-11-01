@@ -62,11 +62,11 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx'],
   },
-  mode: 'development',
-  devServer: {
-    contentBase: path.join(__dirname, 'public/'),
-    port: 3030,
-    publicPath: 'http://localhost:3000/dist/',
-    hotOnly: true,
-  },
+  // mode: 'development',
+  // devServer: {
+  //   contentBase: path.join(__dirname, 'public/'),
+  //   port: 3031,
+  //   publicPath: 'http://localhost:3030/dist/',
+  //   hotOnly: true,
+  // },
 };

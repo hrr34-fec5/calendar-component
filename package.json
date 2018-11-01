@@ -9,10 +9,12 @@
   "scripts": {
     "test": "jest --errorOnDeprecated",
     "lint": "eslint ./",
-    "start": "webpack-cli --watch & live-server --open=./client/public/index.html --port=3000",
+    "watch": "webpack -d --watch",
+    "start": "webpack-cli --watch & live-server --open=./client/public/index.html",
     "db:start": "nodemon ./server/server.js"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "bluebird": "^3.5.2",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
