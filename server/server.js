@@ -12,7 +12,7 @@ const db = require('../models/models.js');
 const app = express();
 const port = 3000;
 
-app.use('/', express.static(path.join(__dirname, '../client')));
+app.use('/', express.static(path.join(__dirname, '../client/dist')));
 app.use(bodyParser.json());
 // app.use('/guest', router);
 // app.use('/host', router);
