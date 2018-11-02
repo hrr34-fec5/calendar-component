@@ -46,7 +46,7 @@ module.exports = {
       },
       {
         test: /\.jsx\.html$/,
-        exclude: /node_modules/,
+        exclude: ["/node_modules/", "/client/jestTests/"],
         use: [
           'babel!react-pure-html-component',
         ],

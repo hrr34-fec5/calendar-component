@@ -254,3 +254,5 @@ app.post('/availableNight', (request, response) => {
 
 // Establish listener
 app.listen(port, () => { console.log(`Listening on port, ${port}`); });
+
+module.exports.app = app;
