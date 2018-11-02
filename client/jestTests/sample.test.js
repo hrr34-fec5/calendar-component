@@ -21,3 +21,34 @@ describe('babel/webpack setup', () => {
     expect(w.text()).to.equal('JSX');
   });
 });
+
+
+// ----------------- SERVER TESTS ----------------- //
+// When I figure out environment variables, I can move these tests
+// back to the appropriate place, which is <rootDir>/server/server.test.js
+// Moving here for now because the server is not able to access a server for which it doesn't have a password
+// Removing the password isn't sufficient given how I've currently configured
+
+// Steps to take once remedied
+// [] Create a new file <rootDir>/server/server.test.js
+// [] Move the code below to the new file
+// [] Delete this comment block
+
+// const request = require('supertest');
+// const {expect} = require('chai');
+
+// const { app } = require('./server.js');
+
+
+// describe('/guest endpoints')
+// describe('/host endpoints')
+// describe('/listing endpoints')
+// describe('/booking endpoints')
+// describe('/availableNights endpoints', () => {
+//   it('should return', () => {
+//     request(app)
+//     .get('/nights')
+//     .expect(200)
+//     .end();
+//   })
+// })
