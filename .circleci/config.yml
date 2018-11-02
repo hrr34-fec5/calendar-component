@@ -8,7 +8,6 @@ jobs:
           name: The First Step
           command: |
             echo 'Hello World!'
-            npm test
   I-Have-Code:
     docker:
       - image: alpine:3.7
@@ -27,7 +26,8 @@ jobs:
       - run:
           name: Runing in a Unique Container
           command: |
-            node -v
+            npm install
+            npm test
   Now-Complete:
     docker:
       - image: alpine:3.7
