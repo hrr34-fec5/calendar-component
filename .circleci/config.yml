@@ -1,6 +1,6 @@
 version: 2.0
 jobs:
-  Hello-World:
+  Run-Tests:
     docker:
       - image: alpine:3.7
     steps:
@@ -8,7 +8,7 @@ jobs:
           name: The First Step
           command: |
             echo 'Hello World!'
-            echo 'This is the delivery pipeline'
+            npm test
   I-Have-Code:
     docker:
       - image: alpine:3.7
@@ -40,13 +40,13 @@ workflows:
   version: 2
   Example_Workflow:
     jobs:
-      - Hello-World
+      - Run-Tests
       - I-Have-Code:
           requires:
-            - Hello-World
+            - Run-Tests
       - Run-With-Node:
           requires:
-            - Hello-World
+            - Run-Tests
       - Hold-For-Approval:
           type: approval
           requires:
