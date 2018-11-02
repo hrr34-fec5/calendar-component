@@ -1,5 +1,5 @@
-// const request = require('supertest');
-// const {expect} = require('chai');
+const request = require('supertest');
+const {expect} = require('chai');
 
 // const { app } = require('./server.js');
 
@@ -16,3 +16,9 @@
 //     .end();
 //   })
 // })
+
+describe ('a sample test', () => {
+  it('1+1 should return 2', () => {
+    expect(1+1).to.equal(2);
+  })
+})
