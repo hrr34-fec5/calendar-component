@@ -26,6 +26,7 @@ jobs:
       - run:
           name: Runing in a Unique Container
           command: |
+            checkout
             npm install
             npm test
   Now-Complete:
