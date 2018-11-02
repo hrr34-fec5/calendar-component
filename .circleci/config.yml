@@ -1,58 +1,71 @@
 version: 2.0
 jobs:
-  Run-Tests:
+  build:
     docker:
-      - image: alpine:3.7
-    steps:
-      - run:
-          name: The First Step
-          command: |
-            echo 'Hello World!'
-  I-Have-Code:
-    docker:
-      - image: alpine:3.7
+      image: circleci/node:8
+    
     steps:
       - checkout
-      - run:
-          name: Code Has Arrived
-          command: |
-            ls -al
-            echo '^^^That should look familiar^^^'
-  Run-With-Node:
-    #  pre-built images: https://circleci.com/docs/2.0/circleci-images/
-    docker:
-      - image: circleci/node:8-browsers
-    steps:
-      - run:
-          name: Runing in a Unique Container
-          command: |
-            checkout
-            npm install
-            npm test
-  Now-Complete:
-    docker:
-      - image: alpine:3.7
-    steps:
-      - run:
-          name: Approval Complete
-          command: |
-            echo 'Do work once the approval has completed'
-workflows:
-  version: 2
-  Example_Workflow:
-    jobs:
-      - Run-Tests
-      - I-Have-Code:
-          requires:
-            - Run-Tests
-      - Run-With-Node:
-          requires:
-            - Run-Tests
-      - Hold-For-Approval:
-          type: approval
-          requires:
-            - I-Have-Code
-            - Run-With-Node
-      - Now-Complete:
-          requires:
-            - Hold-For-Approval
+      - run: npm install
+      - run: npm test
+
+
+
+
+# jobs:
+#   Run-Tests:
+#     docker:
+#       - image: alpine:3.7
+#     steps:
+#       - run:
+#           name: The First Step
+#           command: |
+#             echo 'Hello World!'
+#   I-Have-Code:
+#     docker:
+#       - image: alpine:3.7
+#     steps:
+#       - checkout
+#       - run:
+#           name: Code Has Arrived
+#           command: |
+#             ls -al
+#             echo '^^^That should look familiar^^^'
+#   Run-With-Node:
+#     #  pre-built images: https://circleci.com/docs/2.0/circleci-images/
+#     docker:
+#       - image: circleci/node:8-browsers
+#     steps:
+#       - run:
+#           name: Runing in a Unique Container
+#           command: |
+#             checkout
+#             npm install
+#             npm test
+#   Now-Complete:
+#     docker:
+#       - image: alpine:3.7
+#     steps:
+#       - run:
+#           name: Approval Complete
+#           command: |
+#             echo 'Do work once the approval has completed'
+# workflows:
+#   version: 2
+#   Example_Workflow:
+#     jobs:
+#       - Run-Tests
+#       - I-Have-Code:
+#           requires:
+#             - Run-Tests
+#       - Run-With-Node:
+#           requires:
+#             - Run-Tests
+#       - Hold-For-Approval:
+#           type: approval
+#           requires:
+#             - I-Have-Code
+#             - Run-With-Node
+#       - Now-Complete:
+#           requires:
+#             - Hold-For-Approval
