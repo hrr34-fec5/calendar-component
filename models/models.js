@@ -42,8 +42,8 @@ const Listing = db.define('listings', {
 
 // Booking schema
 const Booking = db.define('bookings', {
-  bookingId: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-  startDate: Sequelize.DATEONLY,
+  bookingId: Sequelize.INTEGER,
+  startDate: { type: Sequelize.DATEONLY, primaryKey: true },
   endDate: Sequelize.DATEONLY,
   price: Sequelize.DECIMAL(10, 2),
   canceled: Sequelize.BOOLEAN,
@@ -55,6 +55,7 @@ const Booking = db.define('bookings', {
       key: 'listingId',
       deferrable: Sequelize.Deferrable.INITIALLY_DEFERRED,
     },
+    primaryKey: true,
   },
   guestId: {
     type: Sequelize.INTEGER,
