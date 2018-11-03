@@ -17,8 +17,8 @@ class App extends React.Component {
   getAvailableNights(listingId){
     axios.get(`/availableNights/${listingId}`)
     .then( (response) => {
-      console.log(`This is the response of the axios GET: ------> `, response.data);
-      console.log(`This is the response.data of the axios GET: ------> `, response);
+      // console.log(`This is the response of the axios GET: ------> `, response.data);
+      // console.log(`This is the response.data of the axios GET: ------> `, response);
       this.setState({availableNights: response.data})
     })
     .catch( (error) => {
