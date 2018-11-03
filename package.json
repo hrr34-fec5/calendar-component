@@ -9,6 +9,9 @@
   "scripts": {
     "test": "jest --verbose --detectOpenHandles",
     "lint": "eslint ./",
+    "seed": "node ./database/seedStep1.js | grep node",
+    "seed2": "node ./database/seedStep2.js",
+    "seed3": "node ./database/seedStep3.js",
     "watch": "webpack -d --watch",
     "start": "webpack-cli --watch & live-server --open=./client/public/index.html",
     "db:start": "nodemon ./server/server.js"
