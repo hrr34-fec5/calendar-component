@@ -70,8 +70,8 @@ const Booking = db.define('bookings', {
 
 // Avaialble nights schema
 const ListingAvailableNight = db.define('listing_available_night', {
-  nightId: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-  startDate: Sequelize.DATEONLY,
+  nightId: { type: Sequelize.INTEGER },
+  startDate: { type: Sequelize.DATEONLY, primaryKey: true },
   endDate: Sequelize.DATEONLY,
   booked: Sequelize.BOOLEAN,
   price: Sequelize.DOUBLE(10, 2),
@@ -90,6 +90,7 @@ const ListingAvailableNight = db.define('listing_available_night', {
       key: 'listingId',
       deferrable: Sequelize.Deferrable.INITIALLY_DEFERRED,
     },
+    primaryKey: true,
   },
 }, {
   timestamps: false,
@@ -120,8 +121,8 @@ db.sync()
   .then(() => db.query('USE grounded_n_grits'))
   .then(() => User.sync())
   .then(() => Listing.sync())
-  .then(() => Booking.sync())
   .then(() => ListingAvailableNight.sync())
+  .then(() => Booking.sync())
   .then(() => console.log('Sequelize Sync worked!'))
   .catch(err => console.log('Oh, no! An Error!', err));
 
