@@ -13,22 +13,72 @@ class Calendar extends React.Component {
     this.state = {
       focusedInput: props.autoFocusEndDate ? 'endDate' : 'startDate',
       startDate: null,
+      startDayMinusOne: null,
+      firstUnavailableNight: null,
       endDate: null,
-      availableNights: this.props.availableNights,
+      // availableNights: this.props.availableNights,
       minimumNights: this.props.minimumNights,
       showInputs: true,
-    };
+    }
 
     this.onDatesChange = this.onDatesChange.bind(this);
     this.onFocusChange = this.onFocusChange.bind(this);
     this.isDayBlocked = this.isDayBlocked.bind(this);
+    this.clearDates = this.clearDates.bind(this)
+    this.findFirstUnavailable = this.findFirstUnavailable.bind(this);
   }
   
+  clearDates () {
+    this.setState({startDate: null, endDate: null});
+    this.onFocusChange(this.state.focusedInput);
+  }
+
+  findFirstUnavailable(startDate) {
+    console.log(`The argument for findFirstUnavailable is -->`, startDate);
+    let startDatePosition = 0
+    for (let i = 0; i < this.props.availableNights.length; i++) {
+      if (startDate.isSame(this.props.availableNights[i].startDate,'day')){
+        startDatePosition = i;
+        break;
+      }
+    }
+
+    let searchDate = startDate.clone()
+    // console.log(`The searchdate starts as --> `, searchDate);
+    console.log(`the startDatePosition is --> `, startDatePosition)
+    for (let j = startDatePosition; j < this.props.availableNights.length; j++) {
+      // for each night in available nights (starting at the index of the start date)
+      // currentNight = availablenights[index].startDate  
+      console.log(`Am I iterating through indexes as expected?`,j)
+      let currentNight = moment(this.props.availableNights[j].startDate);
+      console.log(`currentNight is --> `, currentNight);
+      console.log(`searchDate is --> `, searchDate);
+      if (searchDate.isSame(currentNight, 'day')){
+        console.log(`The days are the same -->`)
+        // console.log(`The searchDate is --> `, searchDate);
+        // console.log(`the currentNight is -->`, currentNight);
+      } else {
+        console.log(`The days are different -->`)
+        // console.log(`The searchDate is --> `, searchDate);
+        // console.log(`the currentNight is -->`, currentNight);
+        this.setState({firstUnavailableNight: searchDate});
+        console.log(`The state is now --> `, this.state);
+        return;
+      }
+      searchDate.add(1, 'days')
+    }
+  }
+
   onDatesChange({ startDate, endDate }) {
+    
     this.setState({
       startDate: startDate,
       endDate: endDate,
+      startDayMinusOne: startDate.clone().add(-1, 'days'),
     })
+
+    this.findFirstUnavailable(startDate)
+
   }
 
 
@@ -40,23 +90,27 @@ class Calendar extends React.Component {
   }
 
   isDayBlocked(selectedDate) {
-    let numberOfAvailableNights = this.props.availableNights.length;
-    for ( let night = 0; night < numberOfAvailableNights; night++) {
-      let currentNight = moment(this.props.availableNights[night].startDate);
-      if (selectedDate.isSame(moment(currentNight), "day")) {
-        return false;
-      }
-      else if (currentNight.isAfter(selectedDate, "day")) {
+    // let numberOfAvailableNights = this.props.availableNights.length;
+    // is the startDate in availablenights?
+    
+
+    if (this.state.startDayMinusOne) {
+      if (selectedDate.isBefore(this.state.startDate, 'day')){
+        // console.log(`the startDay_str is -->`, startDay_str);
+        // console.log(`the startDate is --> `, this.state.startDate);
+        // console.log(`selectedDate that is before start -->`, selectedDate._d);
+        // console.log(`the startMinusOne is --> `, this.state.startDayMinusOne._d);
         return true;
       }
-    } 
-    return true;
+    }
+    // is the night *after* the first unavailable?
   }
 
   render() {
     return (
       <div>        
         <h1> The calendar component </h1>
+        <button onClick={this.clearDates}>Clear Dates</button>
         <DayPickerRangeController
           startDate={this.state.startDate} // momentPropTypes.momentObj or null,
           endDate={this.state.endDate} // momentPropTypes.momentObj or null,
