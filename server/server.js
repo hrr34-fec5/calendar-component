@@ -181,6 +181,7 @@ app.get('/availableNights/:listingId', (request, response) => {
       listingId: request.params.listingId,
       booked: false,
     },
+    order: ['startDate']
   })
     .then(results => response.status(200).send(results))
     .catch(err => response.status(404).send(errorMessage, err));
