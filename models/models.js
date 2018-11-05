@@ -33,7 +33,6 @@ const Listing = db.define('listings', {
     references: {
       model: User,
       key: 'userId',
-      deferrable: Sequelize.Deferrable.INITIALLY_DEFERRED,
     },
   },
 }, {
@@ -42,8 +41,8 @@ const Listing = db.define('listings', {
 
 // Booking schema
 const Booking = db.define('bookings', {
-  bookingId: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-  startDate: Sequelize.DATEONLY,
+  bookingId: { type: Sequelize.INTEGER, defaultValue: 0, primaryKey: true },
+  startDate: { type: Sequelize.DATEONLY, primaryKey: true },
   endDate: Sequelize.DATEONLY,
   price: Sequelize.DECIMAL(10, 2),
   canceled: Sequelize.BOOLEAN,
@@ -53,25 +52,25 @@ const Booking = db.define('bookings', {
     references: {
       model: Listing,
       key: 'listingId',
-      deferrable: Sequelize.Deferrable.INITIALLY_DEFERRED,
     },
+    primaryKey: true,
   },
   guestId: {
     type: Sequelize.INTEGER,
     references: {
       model: User,
       key: 'userId',
-      deferrable: Sequelize.Deferrable.INITIALLY_DEFERRED,
     },
   },
 }, {
   timestamps: false,
 });
 
+
 // Avaialble nights schema
 const ListingAvailableNight = db.define('listing_available_night', {
-  nightId: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-  startDate: Sequelize.DATEONLY,
+  nightId: { type: Sequelize.INTEGER },
+  startDate: { type: Sequelize.DATEONLY, primaryKey: true },
   endDate: Sequelize.DATEONLY,
   booked: Sequelize.BOOLEAN,
   price: Sequelize.DOUBLE(10, 2),
@@ -80,7 +79,6 @@ const ListingAvailableNight = db.define('listing_available_night', {
     references: {
       model: Booking,
       key: 'bookingId',
-      deferrable: Sequelize.Deferrable.INITIALLY_DEFERRED,
     },
   },
   listingId: {
@@ -88,20 +86,21 @@ const ListingAvailableNight = db.define('listing_available_night', {
     references: {
       model: Listing,
       key: 'listingId',
-      deferrable: Sequelize.Deferrable.INITIALLY_DEFERRED,
     },
+    primaryKey: true,
   },
 }, {
   timestamps: false,
 });
 
+
 // Establish relationships
 Listing.belongsTo(User, { foreignKey: 'hostId', targetKey: 'userId', constraints: false });
 Booking.belongsTo(Listing, { foreignKey: 'listingId', targetKey: 'listingId', constraints: false });
 Booking.belongsTo(User, { foreignKey: 'guestId', targetKey: 'userId', constraints: false });
+Booking.belongsTo(Listing, { foreignKey: 'listingId', targetKey: 'listingId', constraints: false });
 ListingAvailableNight.belongsTo(Listing, { foreignKey: 'listingId', targetKey: 'listingId', constraints: false });
 ListingAvailableNight.belongsTo(Booking, { foreignKey: 'bookingId', targetKety: 'bookingId', constraints: false });
-Booking.belongsTo(Listing, { foreignKey: 'listingId', targetKey: 'listingId', constraints: false });
 
 // 1:m relationships
 // User.hasMany(Listing, { constraints: false });

@@ -17,40 +17,51 @@ const createListing = () => {
   const listingDescription = faker.lorem.words(10);
   const minimumNights = faker.random.number({ 'min': 0, 'max': 2 });
   const cancellationPolicy = cancellationPolicies[faker.random.number({ 'min': 0, 'max': 3 })];
-  const host_id = faker.random.number({ min: 0, max: 399 });
+  const hostId = faker.random.number({ min: 0, max: 399 });
   return listing = {
-    listingName, listingDescription, minimumNights, cancellationPolicy, host_id,
+    listingName, listingDescription, minimumNights, cancellationPolicy, hostId,
   };
 };
 
-const createAvailableNight = (listingIdInput) => {
+const createAvailableNight = (listingIdInput, nightId) => {
+  nightId = nightId;
   const price = faker.commerce.price(30, 200, 2);
   const startDate = momentRandom('2019-01-31', '2018-11-01');
   const endDate = moment(startDate).add(1, 'days');
   const booked = false;
   const bookingId = undefined;
   const listingId = listingIdInput;
+  // console.log(`the nightId is --> `, nightId);
+  // console.log(`the listingId is --> `, listingId)
+  // console.log(`the startDate is -->`, startDate);
   return availableNight = {
-    startDate, endDate, booked, price, bookingId, listingId,
+    nightId, startDate, endDate, booked, price, bookingId, listingId,
   };
 };
 
 const createBooking = (bookingIdInput, listingIdQuery) => {
+  // console.log(`The bookingIdInput is ----------> ${bookingIdInput}`);
+  // console.log(`The listingIdQuery is ----------> ${listingIdQuery}`);
+  
   db.ListingAvailableNight.findAll({ where: {booked: false, listingId: listingIdQuery}})
   .then( (availableListingNights) => {
     let numOfListings = availableListingNights.length;
-    let selectedListing = faker.random.number({'min':0,'max': numOfListings})
+    let selectedListing = faker.random.number({'min': 1,'max': numOfListings})
+    // console.log(`The selectedListing is ----------> ${selectedListing}`);
     let selectedNightId = availableListingNights[selectedListing].nightId;
+    // console.log(`the selectedListing is ----------> ${availableListingNights[selectedListing]}` )
+    // console.log(`The selectedNightId is ----------> ${selectedNightId}`);
     return db.ListingAvailableNight.find({ where: { nightId: selectedNightId } })})
   .then( (selectedNightToUpdate) => { 
+    const bookingId = bookingIdInput;
     const startDate = selectedNightToUpdate.startDate; 
     const endDate = selectedNightToUpdate.endDate;
     const price = selectedNightToUpdate.price;
     const canceled = Math.random() <= .05 ? true : false;
     const cancellationReason = canceled ? faker.lorem.words(5) : undefined;
     const listingId = selectedNightToUpdate.listingId;
-    const guestId = faker.random.number({ 'min':1, 'max': 400 });
-    db.Booking.create({startDate, endDate, price, canceled, cancellationReason, listingId, guestId})
+    const guestId = faker.random.number({ 'min': 1, 'max': 400 });
+    db.Booking.create({ bookingId, startDate, endDate, price, canceled, cancellationReason, listingId, guestId })
     db.ListingAvailableNight.update(
       {booked: true, bookingId: bookingIdInput }, 
       {returning: true, where: { nightId: selectedNightToUpdate.nightId } })      
@@ -73,7 +84,6 @@ const populateListings = () => {
   for (let i = 0; i < 100; i += 1) {
     listings.push(createListing());
   }
-  console.log(listings);
   db.Listing.bulkCreate(listings, { updatedOnDuplicate: true, individualHooks: true, returning: true })
   .then(() => db.Listing.findAll({}))
   .then(results => console.log(`Listing table has ${results.length} listings.`));
@@ -83,8 +93,8 @@ const populateNights = () => {
   let nights = [];
   for (let listing = 1; listing < 100; listing += 1) {
     const nightsToList = faker.random.number({ min: 30, max: 90 });
-    for (let singleNight = 0; singleNight < nightsToList; singleNight += 1) {
-      let singleNight = createAvailableNight(listing);
+    for (let nightId = 0; nightId < nightsToList; nightId += 1) {
+      let singleNight = createAvailableNight(listing, nightId);
       nights.push(singleNight);
     }
   }
@@ -100,9 +110,10 @@ const populateBookings = () => {
   }
   db.Booking.findAll({})
   .then(results => console.log(`Booking table has ${results.length} bookings.`))
+  .then(() => console.log(`<-- populateBookings ends`))
 }
- 
-Promise.resolve(populateUsers())
-.then(populateListings())
-.then(populateNights())
-.then(populateBookings())
+
+module.exports.populateUsers = populateUsers;
+module.exports.populateListings = populateListings;
+module.exports.populateNights = populateNights;
+module.exports.populateBookings = populateBookings;
