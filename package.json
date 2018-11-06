@@ -7,7 +7,7 @@
     "node": ">=6.13.0"
   },
   "scripts": {
-    "test": "jest --verbose --detectOpenHandles",
+    "test": "jest --verbose --coverage --detectOpenHandles",
     "lint": "eslint ./",
     "seed": "node ./database/seedStep1.js | grep node",
     "seed2": "node ./database/seedStep2.js",
@@ -66,7 +66,20 @@
     "webpack-cli": "^3.1.2"
   },
   "jest": {
-    "setupTestFrameworkScriptFile": "<rootDir>/jestConfig.js"
+    "setupTestFrameworkScriptFile": "<rootDir>/jestConfig.js",
+    "testEnvironment": "enzyme",
+    "testEnvironmentOptions": {
+      "enzymeAdapter": "react16"
+    },
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/jestTests/__mocks__/fileMock.js",
+      "\\.(css|less)$": "<rootDir>/jestTests/__mocks__/styleMock.js"
+    },
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/client/src/stylesheets/",
+      "<rootDir>/client/dist/"
+    ]
   },
   "version": "1.0.0",
   "main": "index.js",

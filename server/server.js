@@ -10,7 +10,7 @@ const db = require('../models/models.js');
 // const router = require('../routes/routes.js');
 
 const app = express();
-const port = 3000;
+const port = 3030;
 
 app.use('/', express.static(path.join(__dirname, '../client/dist')));
 app.use(bodyParser.json());
@@ -176,6 +176,7 @@ app.get('/nights/:listingId', (request, response) => {
 });
 
 app.get('/availableNights/:listingId', (request, response) => {
+  console.log(`The request params ------>`, request.params)
   db.ListingAvailableNight.findAll({
     where: {
       listingId: request.params.listingId,
