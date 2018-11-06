@@ -14,7 +14,7 @@ export default class App extends React.Component {
   }
 
   getAvailableNights(listingId){
-    axios.get(`/availableNights/${listingId}`)
+    axios.get(`http://localhost:3030/availableNights/${listingId}`)
     .then( (response) => {
       this.setState({availableNights: response.data})
     })

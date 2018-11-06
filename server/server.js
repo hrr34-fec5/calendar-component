@@ -11,15 +11,24 @@ const db = require('../models/models.js');
 
 const app = express();
 const port = 3030;
+let headers = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'access-control-allow-credentials': false,
+  'access-control-allow-headers': 'content-type, accept',
+  'access-control-max-age': 10, // Seconds.
+  'content-type': 'application/x-www-form-urlencoded',
+}
+
 
 app.use('/', express.static(path.join(__dirname, '../client/dist')));
 app.use(bodyParser.json());
-// app.use('/guest', router);
-// app.use('/host', router);
-// app.use('/listing', router);
-// app.use('/listingAvailable', router);
-// app.use('/booking', router);
-
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 const errorMessage = 'There was an error creating the record: ';
 
@@ -184,7 +193,7 @@ app.get('/availableNights/:listingId', (request, response) => {
     },
     order: ['startDate']
   })
-    .then(results => response.status(200).send(results))
+    .then(results => { response.status(200).send(results) })
     .catch(err => response.status(404).send(errorMessage, err));
 });
 
