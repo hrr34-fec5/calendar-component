@@ -61,6 +61,11 @@ app.get('/listing', (request, response) => {
     .catch(err => response.status(404).send(errorMessage, err));
 });
 
+app.get('/listing/:listingId', (request, response) => {
+  const serveApp = path.join(`${__dirname}/../client/dist/index.html`);
+  response.status(200).sendFile(serveApp);
+})
+
 app.post('/listing', (request, response) => {
   db.Listing.create({
     listingName: request.body.listingName,
