@@ -13,8 +13,8 @@
     "seed2": "node ./database/seedStep2.js",
     "seed3": "node ./database/seedStep3.js",
     "watch": "webpack -d --watch",
-    "start": "webpack-cli --watch & live-server --open=./client/public/index.html",
-    "db:start": "nodemon ./server/server.js"
+    "db:start": "mysql.server start",
+    "start": "nodemon ./server/server.js"
   },
   "dependencies": {
     "axios": "^0.18.0",

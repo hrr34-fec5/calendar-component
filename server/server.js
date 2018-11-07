@@ -12,11 +12,27 @@ const port = process.env.PORT || 3030;
 app.use('/', express.static(path.join(__dirname, '../client/dist')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// WHY DOES THIS WORK
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
+
+// // WHILE THIS DOESN'T
+// var headers = {
+//   'Access-Control-Allow-Origin': '*',
+//   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+//   'access-control-allow-credentials': false,
+//   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+//   'access-control-max-age': 10, // Seconds.
+//   'content-type': 'application/json',
+// };
+
+// app.options('/*', (req, res, next) => {
+//   res.set({headers})
+// })
 
 const errorMessage = 'There was an error creating the record: ';
 
