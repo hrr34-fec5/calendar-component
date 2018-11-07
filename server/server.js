@@ -3,23 +3,36 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const moment = require('moment');
 const Promise = require('bluebird');
-// const dbConnection = require('../database/database.js');
-// const modelsSQL = require('../models/modelsSQL');
+
 const db = require('../models/models.js');
-// const controller = require('../controllers/controllers');
-// const router = require('../routes/routes.js');
 
 const app = express();
-const port = 3030;
+const port = process.env.PORT || 3030;
 
 app.use('/', express.static(path.join(__dirname, '../client/dist')));
 app.use(bodyParser.json());
-// app.use('/guest', router);
-// app.use('/host', router);
-// app.use('/listing', router);
-// app.use('/listingAvailable', router);
-// app.use('/booking', router);
+app.use(bodyParser.urlencoded({ extended: true }));
 
+// WHY DOES THIS WORK
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
+// // WHILE THIS DOESN'T
+// var headers = {
+//   'Access-Control-Allow-Origin': '*',
+//   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+//   'access-control-allow-credentials': false,
+//   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+//   'access-control-max-age': 10, // Seconds.
+//   'content-type': 'application/json',
+// };
+
+// app.options('/*', (req, res, next) => {
+//   res.set({headers})
+// })
 
 const errorMessage = 'There was an error creating the record: ';
 
@@ -63,6 +76,11 @@ app.get('/listing', (request, response) => {
     .then(results => response.status(200).send(results))
     .catch(err => response.status(404).send(errorMessage, err));
 });
+
+app.get('/listing/:listingId', (request, response) => {
+  const serveApp = path.join(`${__dirname}/../client/dist/index.html`);
+  response.status(200).sendFile(serveApp);
+})
 
 app.post('/listing', (request, response) => {
   db.Listing.create({
@@ -184,7 +202,7 @@ app.get('/availableNights/:listingId', (request, response) => {
     },
     order: ['startDate']
   })
-    .then(results => response.status(200).send(results))
+    .then(results => { response.status(200).send(results) })
     .catch(err => response.status(404).send(errorMessage, err));
 });
 
@@ -224,35 +242,6 @@ app.post('/availableNight', (request, response) => {
     .then(result => response.status(201).send(result))
     .catch(err => response.status(500).send(errorMessage, err));
 });
-
-
-// [] Add PATCH verb endpoints
-// app.patch('bookANight/:startDate/:listingId', (request, response) => {
-//   // I: a listingId
-//   // O: a response from updating a specific listingId depending on what's in the request.body
-//   // Question: How do you make this *flexible* such that you don't
-//   // patch something to undefined, but only take values that are known?
-//   console.log(request.body);
-//   db.ListingAvailableNight.update(
-//     { booked: request.body.booked,
-//       bookingId: request.body.bookingId,
-//     }, { where: {
-//         startDate: request.params.startDate,
-//         listingId: request.params.listingId,
-//     } })
-//     .then(results => response.status(203).send(results)) // [] Verify HTTP Status code
-//     .catch(err => response.status(404).send(errorMessage, err));
-// });
-
-// [] finish this multi-parameter booking
-// app.get('/booking/:guestId/:listingId', (request, response) => {
-//   console.log(request.params);
-//   response.status(200).send();
-// });
-
-// [] Add DELETE verb endpoints
-// [] Graceful error handling (why does my server shut off when i submit a booking that can't exist
-// -- i.e. with a host guest that doesn't exist)
 
 // Establish listener
 app.listen(port, () => { console.log(`Listening on port, ${port}`); });

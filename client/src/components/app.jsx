@@ -14,18 +14,20 @@ export default class App extends React.Component {
   }
 
   getAvailableNights(listingId){
-    axios.get(`/availableNights/${listingId}`)
-    .then( (response) => {
-      this.setState({availableNights: response.data})
-    })
-    .catch( (error) => {
-        console.log(`The error of the axios is: -------> `, error);
-      })
+    axios.get(`http://localhost:3030/availableNights/${listingId}`)
+    .then( (response) => { this.setState({availableNights: response.data}) })
+    .catch( (error) => { console.log(`The error of the axios is: -------> `, error); })
   }
 
   componentDidMount(){
-    let listingId = Math.round(Math.random()*100); // This pulls a listing at random;
-    this.getAvailableNights(listingId);
+
+    const url = window.location.href.split('/');
+    const id = Number(url[url.length - 1]);
+    if (!isNaN(id) && id > 0 ) {
+      this.getAvailableNights(id);
+    } else {
+      console.log(`No Listing present`)
+    }
   }
   
   render() {
