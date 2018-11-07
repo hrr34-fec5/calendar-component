@@ -3,23 +3,11 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const moment = require('moment');
 const Promise = require('bluebird');
-// const dbConnection = require('../database/database.js');
-// const modelsSQL = require('../models/modelsSQL');
+
 const db = require('../models/models.js');
-// const controller = require('../controllers/controllers');
-// const router = require('../routes/routes.js');
 
 const app = express();
-const port = 3030;
-let headers = {
-  'access-control-allow-origin': '*',
-  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-credentials': false,
-  'access-control-allow-headers': 'content-type, accept',
-  'access-control-max-age': 10, // Seconds.
-  'content-type': 'application/x-www-form-urlencoded',
-}
-
+const port = process.env.PORT || 3030;
 
 app.use('/', express.static(path.join(__dirname, '../client/dist')));
 app.use(bodyParser.json());
@@ -233,35 +221,6 @@ app.post('/availableNight', (request, response) => {
     .then(result => response.status(201).send(result))
     .catch(err => response.status(500).send(errorMessage, err));
 });
-
-
-// [] Add PATCH verb endpoints
-// app.patch('bookANight/:startDate/:listingId', (request, response) => {
-//   // I: a listingId
-//   // O: a response from updating a specific listingId depending on what's in the request.body
-//   // Question: How do you make this *flexible* such that you don't
-//   // patch something to undefined, but only take values that are known?
-//   console.log(request.body);
-//   db.ListingAvailableNight.update(
-//     { booked: request.body.booked,
-//       bookingId: request.body.bookingId,
-//     }, { where: {
-//         startDate: request.params.startDate,
-//         listingId: request.params.listingId,
-//     } })
-//     .then(results => response.status(203).send(results)) // [] Verify HTTP Status code
-//     .catch(err => response.status(404).send(errorMessage, err));
-// });
-
-// [] finish this multi-parameter booking
-// app.get('/booking/:guestId/:listingId', (request, response) => {
-//   console.log(request.params);
-//   response.status(200).send();
-// });
-
-// [] Add DELETE verb endpoints
-// [] Graceful error handling (why does my server shut off when i submit a booking that can't exist
-// -- i.e. with a host guest that doesn't exist)
 
 // Establish listener
 app.listen(port, () => { console.log(`Listening on port, ${port}`); });
