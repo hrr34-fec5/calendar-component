@@ -22,6 +22,8 @@ Update the `./database/database.js` file with your personal configuration.
 
 Alternatively, you create a new file `./config/config.js` to store the credentials. This file has been ignored by Git for security.
 
+For convenience, the bundle.js has been included. However, if changes are made, use `npm run watch` to rebundle. 
+
 Finally - run 
 1. Start mySQL using the script `npm run db:start`
 2. Start the server using `npm start`
