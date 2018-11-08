@@ -2,10 +2,10 @@ const Sequelize = require('sequelize');
 const { config } = require('../config/config.js');
 
 // Local DB connection
-const db = new Sequelize('grounded_n_grits', 'root', config.development.password, {
-  host: '127.0.0.1',
-  dialect: 'mysql',
-  port: '3306',
+const db = new Sequelize(config.development.database, config.development.username, config.development.password, {
+  host: config.development.host,
+  dialect: config.development.dialect,
+  port: config.development.port,
   logging: false,
 });
 
