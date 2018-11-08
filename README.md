@@ -22,11 +22,10 @@ Update the `./database/database.js` file with your personal configuration.
 
 Alternatively, you create a new file `./config/config.js` to store the credentials. This file has been ignored by Git for security.
 
-For convenience, the bundle.js has been included. However, if changes are made, use `npm run watch` to rebundle. 
-
 Finally - run 
-1. Start mySQL using the script `npm run db:start`
-2. Start the server using `npm start`
+1. Run `npm run watch` to create a bundle.js file for the server to serve
+2. Start mySQL using the script `npm run db:start`
+3. Start the server using `npm start`
 
 ## Requirements
 
@@ -45,6 +44,15 @@ From within the root directory:
 npm install -g webpack
 npm install
 ```
+
+### Preparing MySQL
+
+This project uses mySQL and Sequelize. In order to use it correctly, you will need to configure a file to match your credentials.
+
+To aid in this process, there is a `config/configExample.js` file.
+
+1. Make a copy of this file in the same directory named `config.js`
+2. Update the credentials to meet your environment. 
 
 ### Seeding Database
 For testing and development purposes, it may be useful to seed the database.
