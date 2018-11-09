@@ -13,7 +13,7 @@
     "seed2": "node ./database/seedStep2.js",
     "seed3": "node ./database/seedStep3.js",
     "watch": "webpack -d --watch",
-    "db:start": "mysql.server start",
+    "db:start": "mysql.server start | mysql -u root -p < database/schema.sql",
     "start": "nodemon ./server/server.js"
   },
   "dependencies": {

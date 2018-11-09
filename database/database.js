@@ -2,9 +2,9 @@ const mysql = require('mysql2');
 const { config } = require('../config/config.js');
 
 const dbConnection = mysql.createConnection({
-  user: 'root',
+  user: config.development.username,
   password: config.development.password,
-  database: 'grounded_n_grits',
+  database: config.development.database,
 });
 dbConnection.connect();
 
